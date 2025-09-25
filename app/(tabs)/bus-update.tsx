@@ -43,12 +43,21 @@ const labels = {
     notes: 'नोंदी / अतिरिक्त माहिती',
     submit: 'बस तपशील सादर करा',
   },
-};
+} as const;
+
+type LanguageCode = keyof typeof labels;
+
+function getLabel(lang: unknown): typeof labels[LanguageCode] {
+  if (typeof lang === 'string' && lang in labels) return labels[lang as LanguageCode];
+  return labels.en;
+}
 
 export default function BusUpdate() {
   const params = useLocalSearchParams();
-  const language = typeof params.language === 'string' ? params.language : 'en';
-  const t = labels[language] || labels.en;
+  const languageParam = params.language;
+  const language = getLabel(languageParam) ? (languageParam as LanguageCode) : 'en';
+
+  const t = getLabel(language);
 
   const [busNo, setBusNo] = useState('');
   const [destination, setDestination] = useState('');
