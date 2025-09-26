@@ -1,62 +1,38 @@
-import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Button, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
-
-const messages = {
-  en: { empNo: 'Employee Number', preferredLang: 'Preferred Language', otherDetails: 'Other Details', signIn: 'Sign In' },
-  hi: { empNo: 'कर्मचारी संख्या', preferredLang: 'अपनी भाषा चुनें', otherDetails: 'अन्य विवरण', signIn: 'साइन इन करें' },
-  ta: { empNo: 'பணியாளரின் எண்', preferredLang: 'வாங்கிய மொழி', otherDetails: 'பிற விவரங்கள்', signIn: 'உள்நுழைக' },
-  mr: { empNo: 'कर्मचारी नंबर', preferredLang: 'पसंदीदा भाषा', otherDetails: 'इतर तपशील', signIn: 'साईन इन' },
-} as const;  // 'as const' gives us exact string literal types for keys
-
-type LanguageCode = keyof typeof messages;
-
-function getMessage(lang: unknown): typeof messages[LanguageCode] {
-  if (typeof lang === 'string' && lang in messages) return messages[lang as LanguageCode];
-  return messages.en;
-}
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import { registerConductor } from "../../services/api";
 
 export default function SignIn() {
+  const [empNo, setEmpNo] = useState("");
+  const [empName, setEmpName] = useState("");
+  const [workingBus, setWorkingBus] = useState("");
+  const [otherDetails, setOtherDetails] = useState("");
+  const [preferredLang, setPreferredLang] = useState("en");
+  const [password, setPassword] = useState("");
   const router = useRouter();
-  const [empNo, setEmpNo] = useState('');
-  const [language, setLanguage] = useState<LanguageCode>('en');
-  const [otherDetails, setOtherDetails] = useState('');
 
-  const t = getMessage(language);
-
-  const handleSubmit = () => {
-    router.push({
-      pathname: '/bus-update',
-      params: { language, empNo, otherDetails },
-    });
+  const handleRegister = async () => {
+    await registerConductor({ empNo, empName, workingBus, otherDetails, preferredLang, password });
+    router.replace("/bus-update");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{t.empNo}</Text>
-      <TextInput style={styles.input} value={empNo} onChangeText={setEmpNo} keyboardType="number-pad" />
-      <Text style={styles.label}>{t.preferredLang}</Text>
-      <Picker
-        selectedValue={language}
-        onValueChange={(val) => setLanguage(val as LanguageCode)}
-        style={Platform.OS === 'ios' ? styles.pickerIOS : styles.picker}
-      >
-        {Object.entries(messages).map(([key]) => (
-          <Picker.Item key={key} label={key.toUpperCase()} value={key} />
-        ))}
-      </Picker>
-      <Text style={styles.label}>{t.otherDetails}</Text>
-      <TextInput style={styles.input} value={otherDetails} onChangeText={setOtherDetails} />
-      <Button title={t.signIn} onPress={handleSubmit} />
+      <Text style={styles.title}>Conductor Sign-In</Text>
+      <TextInput style={styles.input} placeholder="Employee Number" value={empNo} onChangeText={setEmpNo} />
+      <TextInput style={styles.input} placeholder="Employee Name" value={empName} onChangeText={setEmpName} />
+      <TextInput style={styles.input} placeholder="Working Bus" value={workingBus} onChangeText={setWorkingBus} />
+      <TextInput style={styles.input} placeholder="Other Details" value={otherDetails} onChangeText={setOtherDetails} />
+      <TextInput style={styles.input} placeholder="Preferred Language" value={preferredLang} onChangeText={setPreferredLang} />
+      <TextInput style={styles.input} placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
+      <Button title="Sign In" onPress={handleRegister} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  label: { marginVertical: 8, fontWeight: 'bold', fontSize: 16 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 12, borderRadius: 6 },
-  picker: { height: 50, width: '100%' },
-  pickerIOS: { height: 150, width: '100%' },
+  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 32 },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
+  input: { width: "85%", padding: 12, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, marginBottom: 15 },
 });

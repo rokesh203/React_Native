@@ -1,49 +1,22 @@
-import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import LanguagePicker from './LanguagePicker'; // Same folder import
+import { View, Text, StyleSheet } from 'react-native';
+import LanguagePicker from '../../components/ui/LanguagePicker';
 
-export default function Home() {
-  const router = useRouter();
+
+export default function Index() {
   const [language, setLanguage] = useState('en');
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>QR-based Smart Travel Assistant</Text>
-      <Text style={styles.subtitle}>Choose language for your bus info:</Text>
-      <LanguagePicker selected={language} setSelected={setLanguage} />
-      <TouchableOpacity
-        style={styles.scanButton}
-        onPress={() => router.push({ pathname: '/scanner', params: { language } })}
-      >
-        <Text style={styles.scanText}>Scan QR Code</Text>
-      </TouchableOpacity>
-      <View style={styles.infoBox}>
-        <Text style={styles.infoTitle}>How it works</Text>
-        <Text style={styles.infoText}>
-          Scan the QR on a bus or at a stop. Live details appear in your selected language.
-        </Text>
-      </View>
+      <Text style={styles.heading}>Select your preferred language</Text>
+      <LanguagePicker selectedLanguage={language} onLanguageChange={setLanguage} />
+      <Text style={styles.selectedText}>Current Selection: {language}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, alignItems: 'center', backgroundColor: '#f9fafb' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 8, color: '#2d3a4b' },
-  subtitle: { fontSize: 16, color: '#555', marginBottom: 12 },
-  scanButton: { marginTop: 18, backgroundColor: '#2563eb', paddingVertical: 16, paddingHorizontal: 36, borderRadius: 12 },
-  scanText: { color: 'white', fontSize: 18, fontWeight: '700' },
-  infoBox: {
-    marginTop: 32,
-    backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 14,
-    width: '90%',
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-  },
-  infoTitle: { fontWeight: 'bold', marginBottom: 6, fontSize: 16 },
-  infoText: { color: '#444', fontSize: 15 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  heading: { fontWeight: '600', fontSize: 18, marginBottom: 20 },
+  selectedText: { marginTop: 30, fontSize: 16 },
 });
